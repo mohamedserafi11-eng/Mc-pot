@@ -2,7 +2,7 @@ const http = require('http');
 const https = require('https');
 
 // --- إعدادات الروابط ---
-const REPLIT_URL = 'https://your-project.your-username.replit.app'; // استبدل هذا برابط بوت ريبلت الخاص بك
+const REPLIT_URL = 'https://92bcca91-f646-4c5a-bda4-697efec0528f-00-37sx7lj7q2b5l.kirk.replit.dev/__mockup'; // استبدل هذا برابط بوت ريبلت الخاص بك
 const PORT = process.env.PORT || 3000;
 
 // 1. خادم HTTP لاستقبال طلبات UptimeRobot
