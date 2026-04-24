@@ -1,0 +1,27 @@
+name: Minecraft Bot 24/7
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '*/15 * * * *' # سيعيد تشغيل نفسه كل 15 دقيقة للتأكد أنه يعمل
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Bot
+        run: node index.js # تأكد أن index.js لا يحتوي على بروكسي
+        env:
+          CI: true
