@@ -5,8 +5,8 @@ const { SocksProxyAgent } = require('socks-proxy-agent');
 // ==========================================
 // 1. إعدادات البروكسي (تأكد من صحتها)
 // ==========================================
-const PROXY_HOST = '186.215.87.194'; // الأي بي الخاص بك
-const PROXY_PORT = '5507';           // البورت الخاص بك
+const PROXY_HOST = '95.216.147.112'; // الأي بي الخاص بك
+const PROXY_PORT = '1080';           // البورت الخاص بك
 
 const proxyUrl = `socks5://${PROXY_HOST}:${PROXY_PORT}`;
 const agent = new SocksProxyAgent(proxyUrl);
