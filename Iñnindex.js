@@ -1,63 +1,78 @@
 const mineflayer = require('mineflayer');
 const http = require('http');
-const { SocksProxyAgent } = require('socks-proxy-agent'); // استدعاء مكتبة البروكسي
+const { SocksProxyAgent } = require('socks-proxy-agent');
 
-// ========== إعدادات البروكسي (يجب تعبئتها) ==========
-// يمكنك الحصول على بروكسي مجاني أو مدفوع (SOCKS5)
-const proxyOptions = {
-    host: '216.26.235.113',
-    port: 3129,
-    username: '17sbjm71pl5d', 
-    password: 'k4l94jb8b15do0s'
-};
+// ==========================================
+// 1. إعدادات البروكسي (تأكد من صحتها)
+// ==========================================
+const PROXY_HOST = '186.215.87.194'; // الأي بي الخاص بك
+const PROXY_PORT = '5507';           // البورت الخاص بك
 
-// إنشاء الوكيل (Agent)
-const proxyUrl = `socks5://${proxyOptions.host}:${proxyOptions.port}`;
+const proxyUrl = `socks5://${PROXY_HOST}:${PROXY_PORT}`;
 const agent = new SocksProxyAgent(proxyUrl);
 
-// ========== خادم HTTP لـ Render (Keep-Alive) ==========
+// ==========================================
+// 2. خادم الويب لإبقاء Render مستيقظاً
+// ==========================================
 const PORT = process.env.PORT || 3000;
-http.createServer((req, res) => res.end('OK')).listen(PORT, () => {
-    console.log(`✅ Keep-alive server on port ${PORT}`);
+http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Bot Status: Online and Active');
+}).listen(PORT, () => {
+    console.log(`✅ خادم المنبه يعمل على منفذ: ${PORT}`);
 });
 
-const randomName = 'Guest' + Math.floor(Math.random() * 10000);
-
-const botOptions = {
-    host: 'MMCPvp07.aternos.me',
-    port: 25565,
-    username: randomName,
-    version: "1.20.1", // يُفضل تحديد النسخة بدقة عند استخدام البروكسي
-    auth: 'offline',
-    agent: agent,      // <<< هذا هو السطر الأهم: ربط البوت بالبروكسي
-    fakeHost: 'MMCPvp07.aternos.me',
-    hideErrors: false,
-    keepAlive: true,
-    family: 4          // إجبار الاتصال عبر IPv4
-};
-
-// ... (بقية كود الحركات العشوائية وإعادة الاتصال كما هي في كودك السابق) ...
-
+// ==========================================
+// 3. إعدادات البوت والدخول
+// ==========================================
 function createBot() {
-    console.log(`🌐 محاولة الاتصال عبر البروكسي: ${proxyOptions.host}`);
-    console.log(`🔄 محاولة الدخول باسم ${botOptions.username} ...`);
+    const randomName = 'ProBot_' + Math.floor(Math.random() * 9999);
     
+    const botOptions = {
+        host: 'MMCPvp07.aternos.me',
+        port: 25565,
+        username: randomName,
+        version: "1.20.1",
+        auth: 'offline',
+        agent: agent, // استخدام البروكسي لكسر حظر ريندر
+        hideErrors: false,
+        keepAlive: true,
+        checkTimeoutInterval: 60000
+    };
+
+    console.log(`📡 جاري محاولة الدخول عبر البروكسي: ${PROXY_HOST}...`);
     const bot = mineflayer.createBot(botOptions);
 
-    // مستمع الأخطاء (مهم جداً لمعرفة لو كان البروكسي لا يعمل)
+    // عند الدخول بنجاح
+    bot.on('spawn', () => {
+        console.log(`✅ [${new Date().toLocaleTimeString()}] تم دخول البوت باسم: ${bot.username}`);
+        
+        // منع الطرد بسبب الخمول (Anti-AFK)
+        setInterval(() => {
+            if (bot && bot.entity) {
+                bot.setControlState('jump', true);
+                setTimeout(() => bot.setControlState('jump', false), 500);
+                // نظرة عشوائية بسيطة
+                const yaw = Math.random() * Math.PI * 2;
+                bot.look(yaw, 0, false);
+            }
+        }, 30000); // كل 30 ثانية
+    });
+
+    // معالجة الأخطاء
     bot.on('error', (err) => {
-        console.log(`❌ خطأ: ${err.message}`);
-        if (err.message.includes('proxy')) {
-            console.log('⚠️ مشكلة في البروكسي نفسه (قد يكون متوقفاً)');
+        console.log(`❌ خطأ في البوت: ${err.message}`);
+        if (err.message.includes('ECONNREFUSED')) {
+            console.log('⚠️ البروكسي قد يكون توقف عن العمل، حاول استبداله.');
         }
     });
 
-    bot.on('spawn', () => {
-        console.log('✅ تم دخول البوت بنجاح عبر البروكسي!');
+    // عند الانفصال
+    bot.on('end', () => {
+        console.log('⚠️ تم قطع الاتصال بالسيرفر. محاولة العودة بعد 15 ثانية...');
+        setTimeout(createBot, 15000);
     });
-
-    // ... (بقية الـ Event Listeners) ...
-    return bot;
 }
 
+// تشغيل العملية
 createBot();
