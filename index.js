@@ -8,7 +8,7 @@ http.createServer((req, res) => res.end('OK')).listen(PORT, () => {
 
 const botOptions = {
     host: 'MMCPvp07.aternos.me',
-    port: 25565,                // غيّر إلى المنفذ الصحيح من لوحة Aternos
+    port: 18083,                // غيّر إلى المنفذ الصحيح من لوحة Aternos
     username: 'Bot' + Math.floor(Math.random() * 10000),
     version: false              // يكتشف الإصدار تلقائياً
 };
