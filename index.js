@@ -20,4 +20,4 @@ setInterval(() => {
     }).on('error', (err) => {
         console.error(`❌ [${new Date().toLocaleTimeString()}] Replit is down: ${err.message}`);
     });
-}, 120000); // 120000 مللي ثانية = دقيقتان
+}, 30000); // 120000 مللي ثانية = دقيقتان
